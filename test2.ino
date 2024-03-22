@@ -3,15 +3,11 @@
 #include <Wire.h>
 #include <DHT.h>
 #include <MsTimer2.h>
-#include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 #define DEBUG
 
 #define ARR_CNT 5
 #define CMD_SIZE 60
-char lcdLine1[17] = "Smart IoT By KSH";
-char lcdLine2[17] = "";
 char sendBuf[CMD_SIZE];
 char recvId[10] = "KSH_SQL";  // SQL 저장 클라이이언트 ID
 unsigned int secCount;
@@ -27,10 +23,6 @@ void setup()
   Serial.begin(115200);
   Serial.println("setup() start!");
 #endif
-  lcd.init();
-  lcd.backlight();
-  lcdDisplay(0, 0, lcdLine1);
-  lcdDisplay(0, 1, lcdLine2);
  
   BTSerial.begin(9600); 
   myservo1.attach(6);
@@ -70,12 +62,6 @@ void bluetoothEvent()
       break;
     pToken = strtok(NULL, "[@]");
   }
-
-  if ((strlen(pArray[1]) + strlen(pArray[2])) < 16)
-  {
-    sprintf(lcdLine2, "%s %s", pArray[1], pArray[2]);
-    lcdDisplay(0, 1, lcdLine2);
-  }
   
   if (!strcmp(pArray[1], "SERVO")) {
     sprintf(sendBuf, "[%s]%s\n", pArray[0], pArray[1]);
@@ -106,11 +92,3 @@ void bluetoothEvent()
   BTSerial.write(sendBuf);
 }
 
-void lcdDisplay(int x, int y, char * str) // 이전에 남아있던 LCD 문자 지우려는 함수
-{
-  int len = 16 - strlen(str);
-  lcd.setCursor(x, y);
-  lcd.print(str);
-  for (int i = len; i > 0; i--)
-    lcd.write(' ');
-}
