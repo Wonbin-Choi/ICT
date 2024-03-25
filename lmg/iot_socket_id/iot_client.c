@@ -92,7 +92,7 @@ void *send_msg(void *arg) {
 
     while (1) {
         // 데이터베이스에서 새로운 메시지를 가져오는 쿼리 실행
-        if (mysql_query(conn, "SELECT * FROM message_queue") != 0) {
+        if (mysql_query(conn, "SELECT * FROM message_queue2") != 0) {
             fprintf(stderr, "mysql_query() failed\n");
             continue;
         }
@@ -106,7 +106,7 @@ void *send_msg(void *arg) {
         // 가져온 메시지를 서버에 전송
     	while ((row = mysql_fetch_row(result)) != NULL) {
         	write(*sock, row[1], strlen(row[1])); // 메시지는 두 번째 컬럼에 저장되어 있을 것으로 가정
-        	mysql_query(conn, "DELETE FROM message_queue");
+        	mysql_query(conn, "DELETE FROM message_queue2");
     }
         // 메시지 전송 후 테이블 비우기
        // mysql_query(conn, "DELETE FROM message_queue");
