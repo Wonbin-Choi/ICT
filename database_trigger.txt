@@ -10,10 +10,11 @@ MariaDB [wild]> describe wild_animal;
 +-----------+-------------+------+-----+---------------------+-------+
 
 // trigger
-DELIMITER ;MariaDB [wild]> CREATE TRIGGER wild_animal_insert_trigger AFTER INSERT ON wild_animal2 FOR EACH ROW
-    -> BEGIN
-    ->     DECLARE message_text VARCHAR(255);
-    ->     SET message_text = CONCAT('[LMG_BT', NEW.area, ']SERVO\n');
-    ->     INSERT INTO message_queue2 (message) VALUES (message_text);
-    -> END;
+DELIMITER //
+CREATE TRIGGER wild_animal_insert_trigger2 AFTER INSERT ON wild_animal2 FOR EACH ROW
+BEGIN
+    DECLARE message_text VARCHAR(255);
+    SET message_text = CONCAT('[LMG_BT',NEW.camera_id,']SERVO\n');
+    INSERT INTO message_queue2 (message) VALUES (message_text);
+END//
 DELIMITER ;
