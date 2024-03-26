@@ -1,0 +1,19 @@
+// database_structure
+MariaDB [wild]> describe wild_animal;
++-----------+-------------+------+-----+---------------------+-------+
+| Field     | Type        | Null | Key | Default             | Extra |
++-----------+-------------+------+-----+---------------------+-------+
+| species   | varchar(20) | YES  |     | NULL                |       |
+| count     | varchar(20) | YES  |     | NULL                |       |
+| camera_id | varchar(20) | YES  |     | NULL                |       |
+| createdAt | timestamp   | NO   |     | current_timestamp() |       |
++-----------+-------------+------+-----+---------------------+-------+
+
+// trigger
+DELIMITER ;MariaDB [wild]> CREATE TRIGGER wild_animal_insert_trigger AFTER INSERT ON wild_animal2 FOR EACH ROW
+    -> BEGIN
+    ->     DECLARE message_text VARCHAR(255);
+    ->     SET message_text = CONCAT('[LMG_BT', NEW.area, ']SERVO\n');
+    ->     INSERT INTO message_queue2 (message) VALUES (message_text);
+    -> END;
+DELIMITER ;
