@@ -10,7 +10,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define ARR_CNT 5
 #define CMD_SIZE 60
 char sendBuf[CMD_SIZE];
-char recvId[10] = "KSH_UNO";
+char recvId[10] = "LMG_AND";
 char lcdLine1[17] = "Smart Wild alarm";
 char lcdLine2[17] = "Not Founded";
 char lcdLine3[17] = "DANGER! KEEP OUT";
@@ -56,23 +56,7 @@ void loop()
   if (Serial.available())
     BTSerial.write(Serial.read());
 #endif
-  // 부저와 서보 모터 비동기적으로 제어
-  if (buzzerStartTime != 0 && millis() - buzzerStartTime >= 1500) {
-    noTone(3); // 부저 중지
-  }
-  if ((buzzerStartTime != 0 && millis() - buzzerStartTime > 1500) | (buzzerStartTime != 0 && millis() - buzzerStartTime <= 2500)) {
-    tone(3,500); // 부저 중지
-  }
-  if ((buzzerStartTime != 0 && millis() - buzzerStartTime > 2500) | (buzzerStartTime != 0 && millis() - buzzerStartTime <= 3500)) {
-    noTone(3); // 부저 중지
-  }
-  if ((buzzerStartTime != 0 && millis() - buzzerStartTime > 3500) | (buzzerStartTime != 0 && millis() - buzzerStartTime < 4500)) {
-    tone(3,400); // 부저 중지
-  }
-  if ((buzzerStartTime != 0 && millis() - buzzerStartTime >= 4500)) {
-    noTone(3); // 부저 중지
-    buzzerStartTime = 0; // 부저 시작 시간 초기화
-  }
+
   // 서보 모터 제어
   if (servoStartTime != 0 && millis() - servoStartTime >= servoInterval) {
     if (millis() - lastServoMoveTime >= servoInterval) {
@@ -86,17 +70,24 @@ void loop()
 
   // 20초가 지나면 서보 모터 멈춤
   if (servoStartTime != 0 && millis() - servoStartTime >= 40000) {
+    noTone(3);
     myservo1.write(0);
     myservo2.write(0);
     servoStartTime = 0; // 서보 모터 시작 시간 초기화
   }
-
+  if (warningStartTime != 0 && millis() - warningStartTime < 30000){
+    for(int freq = 150; freq <=1800; freq += 2) 
+      tone(3, freq);
+    for(int freq = 1800; freq >=150; freq -= 2) 
+      tone(3, freq);
+  }
   // 야생동물 포착후 10분 동안 주의 문구 표시
-  if (warningStartTime != 0 && millis() - warningStartTime >= 600000){
+  if (warningStartTime != 0 && millis() - warningStartTime >= 30000){
     lcdDisplay(0,0,lcdLine1);
     lcdDisplay(0,1,lcdLine2);
     warningStartTime = 0;
   }
+  noTone(3);
 }
 
 void bluetoothEvent()
@@ -125,7 +116,6 @@ void bluetoothEvent()
     sprintf(sendBuf, "[%s]%s\n", pArray[0], pArray[1]);
     lcdDisplay(0,0,lcdLine3);
     lcdDisplay(0,1,lcdLine4);
-    tone(3, 261.6);
     buzzerStartTime = millis(); // 부저 시작 시간 기록
     servoStartTime = millis(); // 서보 모터 시작 시간 기록
     lastServoMoveTime = millis(); // 마지막 서보 모터 움직인 시간 초기화
