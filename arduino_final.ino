@@ -1,8 +1,6 @@
 #include <Servo.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
-#include <DHT.h>
-#include <MsTimer2.h>
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
